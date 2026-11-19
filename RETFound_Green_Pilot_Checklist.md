@@ -1,6 +1,6 @@
 # RETFound-Green 直接評估 checklist
 
-搭配 [前測計畫](RETFound_Green_Pilot_Plan.md)。目前等待使用者確認 2026-11-19 修訂版。每項記錄證據後再勾選，每階段記錄使用者回覆、日期與核准範圍。
+搭配 [前測計畫](RETFound_Green_Pilot_Plan.md)。階段 2 已完成官方原始權重的輸出查核，等待使用者驗收。每項記錄證據後再勾選，每階段記錄使用者回覆、日期與核准範圍。
 
 ## 階段 0–1　文件與 Git
 
@@ -8,14 +8,21 @@
 - [x] 在放入文件前建立 `pilot/retfound-green-aptos-idrid` 及 `.worktrees/retfound-green`。
 - [x] 放入計畫、checklist、.gitignore，提交舊版文件基線 `db082ea`。原始影像、權重、預測及 worktree 受忽略。
 - [x] 依使用者指示將前測改為既有權重直接推論，更新兩份文件。
-- [ ] **使用者確認**　記錄是否接受修訂版並啟動階段 2。回覆待填。
+- [x] **使用者確認**　2026-11-19 使用者驗收階段 1，並授權執行階段 2。
 
 ## 階段 2　查核模型是否具備 DR 分級輸出
 
-- [ ] 登錄權重名稱、版本、來源及官方推論範例。若實際載入檔案，另記 SHA-256 與環境。
-- [ ] 核對輸出代表特徵或 DR 類別，附分類頭設定與類別對照證據。現有官方範例為 num_classes=0。
-- [ ] 若採原始權重，在 APTOS、IDRiD 的逐張等級分數與整體分類指標欄分別填 N/A，附缺少分級輸出的原因。
+- [x] 登錄作者公布的原始權重 v0.1，檔名 retfoundgreen_statedict.pth。權重名稱與下載路徑依作者 README 查核。階段 2 採文件與推論範例查核，未下載或載入權重。[官方推論範例](https://github.com/justinengelmann/RETFound_Green#basic-useage) · [官方權重下載](https://github.com/justinengelmann/RETFound_Green/releases/download/v0.1/retfoundgreen_statedict.pth)
+- [x] 核對作者範例使用 vit_small_patch14_reg4_dinov2、num_classes=0 與平均池化，直接回傳影像特徵。此輸出介面沒有 DR 0–4 分級頭或類別對照，因此無法對照真實等級計分。
+- [x] 登錄兩資料集的結果可用性。N/A 代表分類指標不適用，這一階段沿用計畫的介面查核方式。
+
+| 資料集 | 逐張 DR 五級分數 | Accuracy | Macro-F1 |
+|---|---|---|---|
+| APTOS | N/A | N/A | N/A |
+| IDRiD | N/A | N/A | N/A |
+
 - [ ] **使用者確認**　呈交查核結果並記錄結案決議。若同意改測既有 DR checkpoint，記錄確切版本、來源及授權範圍後再進入階段 3。
+
 
 ## 階段 3　固定評估資料與規則（僅限已核准的既有五級模型）
 
@@ -39,3 +46,4 @@
 |---|---|---|
 | 2026-11-19 | 使用者授權先建立 Git 與分支，再放入文件。階段 1 已完成設定 | Git 配置驗收 |
 | 2026-11-19 | 使用者更正前測範圍，只測既有模型。本次修訂文件 | 修訂版驗收與階段 2 授權 |
+| 2026-11-19 | 階段 1 經使用者確認，啟動並完成階段 2。官方原始 v0.1 在兩資料集的 DR 分類分數皆為 N/A | 階段 2 驗收與結案確認 |
