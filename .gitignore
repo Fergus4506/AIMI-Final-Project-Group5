@@ -1,0 +1,10 @@
+.worktrees/
+data/raw/
+artifacts/
+runs/
+predictions/
+.venv/
+__pycache__/
+.env
+*.pth
+*.pt
