@@ -1,6 +1,6 @@
 # RETFound-Green 前測計畫｜凍結特徵與 k-NN 五級評估
 
-2026-11-19 修訂。計畫在 `final_project_repo/.worktrees/retfound-green` 的 `pilot/retfound-green-aptos-idrid` 分支執行。階段 2 已查核官方原始權重的輸出介面。新版自階段 3 起採固定參考集的 k-NN。進度與各階段驗收證據記入 [checklist](RETFound_Green_Pilot_Checklist.md)。
+2026-11-19 修訂。前測原先在 `pilot/retfound-green-aptos-idrid` 工作區執行。結案後，可從專案根目錄依 [README](README.md) 重現。階段 2 已查核官方原始權重的輸出介面。新版自階段 3 起採固定參考集的 k-NN。進度與各階段驗收證據記入 [checklist](RETFound_Green_Pilot_Checklist.md)。
 
 ## 研究問題
 

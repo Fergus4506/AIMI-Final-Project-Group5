@@ -179,7 +179,7 @@ def main():
     report = {
         "status": "blocked" if problems else "ready_for_review",
         "problems": problems,
-        "paths_relative_to": "pilot worktree",
+        "paths_relative_to": "repository root",
         "sources": {
             "aptos": {"split": "official labeled train",
                       "url": "https://www.kaggle.com/competitions/aptos2019-blindness-detection/data",

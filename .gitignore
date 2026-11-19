@@ -8,3 +8,7 @@ __pycache__/
 .env
 *.pth
 *.pt
+/aptos2019-blindness-detection.zip
+/B. Disease Grading.zip
+/models/
+/data/archives/

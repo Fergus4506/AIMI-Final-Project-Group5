@@ -11,43 +11,60 @@
 
 ## 階段 3　資料與評估規則
 
-**目前進度（2026-11-19）**　資料查核與切分程式已實作，等待正式資料。以合成影像驗證約 80/20 切分、五級覆蓋、重跑雜湊一致，以及排除跨資料集重複後缺級仍會中止。實際張數、雜湊與缺件待正式資料查核。
+**目前進度（2026-11-19）**　正式資料已完成解壓、對帳、逐張解碼及切分。APTOS 保留測試與 IDRiD 官方測試皆符合 DR 五級覆蓋。階段 3 已獲使用者驗收。
 
 - [x] 建立 [階段 3 查核程式](scripts/prepare_stage3.py)。輸出三份正式清單、audit.json 與 exclusions.csv。任一必要清單缺級時，輸出稽核與排除紀錄供查明原因。
 - [x] 確認發布來源。[APTOS 2019 Kaggle](https://www.kaggle.com/competitions/aptos2019-blindness-detection/data) 的有標註 train.csv 與 train_images。[IDRiD 官方頁面](https://idrid.grand-challenge.org/Home/) 指向 IEEE DataPort，需 Disease Grading 的官方 Testing Images 與 Testing Labels。另有 [Zenodo 的 Disease Grading 封存](https://zenodo.org/records/17219542)。
 - [x] 在 pilot worktree 建立 .venv。已驗證 Python 3.9、Pillow 11.3.0、PNG 解碼及查核程式入口。套件站無法連線時，將本機既有的 Pillow 複製至虛擬環境。
-- [ ] 取得實際檔案。APTOS 官方 Kaggle 頁要求同意競賽規則。IDRiD 的 Zenodo ZIP 下載遭瀏覽器封鎖，IEEE DataPort 官方入口要求登入。下載完成後再查核三份清單。
+- [x] 取得並解壓使用者提供的兩個 ZIP。APTOS 解出 5,593 個檔案，IDRiD 解出 520 個檔案。檔名與大小均與 ZIP 清單一致。
 
-執行指令由 pilot worktree 啟動。以下路徑為範例，填入實際解壓位置。需要 Python 3.9 與 Pillow。清單的影像路徑以 pilot worktree 為基準。
+從 pilot worktree 執行下方指令。資料共用專案根目錄的 `data/raw/`。清單中的影像路徑以 pilot worktree 為基準。若重跑，請以另一個未建立的輸出目錄保留本次結果。
 
 ```powershell
-python scripts/prepare_stage3.py --aptos-labels artifacts/aptos/train.csv --aptos-images artifacts/aptos/train_images --idrid-testing-labels "artifacts/idrid/Testing Labels.csv" --idrid-testing-images "artifacts/idrid/Testing Set" --output artifacts/stage3
+$stageOutput = Join-Path (Get-Location).Path 'artifacts/stage3'
+& .\.venv\Scripts\python.exe scripts/prepare_stage3.py --aptos-labels ../../data/raw/aptos2019/train.csv --aptos-images ../../data/raw/aptos2019/train_images --idrid-testing-labels '../../data/raw/idrid/B. Disease Grading/2. Groundtruths/b. IDRiD_Disease Grading_Testing Labels.csv' --idrid-testing-images '../../data/raw/idrid/B. Disease Grading/1. Original Images/b. Testing Set' --output $stageOutput
 ```
 
 
 
-- [ ] 登錄 APTOS、IDRiD 來源、版本、官方 split、影像與標註位置。
-- [ ] 逐筆對帳影像與 DR 標註，每份資料抽查至少三筆 ID、相對路徑與等級。列缺件、標註衝突、解碼失敗與重複影像的處置。
-- [ ] 按種子 42 分層建立 APTOS 約 80% 參考與 20% 測試清單。核對兩者無 ID 或已知病人與重複群組重疊，參考集及保留測試集各自涵蓋五級，並記錄分組與實際比例。
-- [ ] 固定 IDRiD 官方 testing 的有效影像清單。檢查與 APTOS 參考集的確定重複，逐筆記錄排除理由及重疊檢查限制。
-- [ ] **測試集五級覆蓋**　排除與切分完成後，分別填寫 APTOS 與 IDRiD 測試集的 DR 0、1、2、3、4 級有效張數，各級須至少 1 張。APTOS 缺級依計畫調整切分後重核。IDRiD 官方 testing 核對後仍缺級，附各級張數及排除原因，暫緩階段 4 並請使用者確認後續評估範圍。
-- [ ] 為三份清單記錄 SHA-256、張數、各級分布。保存 k=5、cosine、等權投票、平手規則與評分設定。
-- [ ] **使用者確認**　提交資料查核、切分證據及兩測試集各自的五級張數。五級覆蓋通過並取得同意後進入階段 4。
+- [x] 登錄 APTOS 2019 Kaggle 官方有標註 train 與 IDRiD Disease Grading 官方 testing。兩份標註路徑與 SHA-256 見 [audit.json](artifacts/stage3/audit.json)。
+- [x] 四個官方分割的影像 ID 均與 CSV 逐筆吻合。前測使用的影像皆成功解碼。APTOS 排除 96 張同級重複影像，另隔離 62 張像素相同但等級有衝突的影像。排除清單見 [exclusions.csv](artifacts/stage3/exclusions.csv)，三份清單各三筆抽查見 `audit.json`。
+- [x] 以種子 42 分層切分 APTOS 的 3,504 張有效影像。參考集 2,804 張，測試集 700 張（19.98%），兩組皆涵蓋五級，ID 與精確 RGB 像素雜湊無交集。官方 CSV 無病人 ID 可驗證病人層級隔離。
+- [x] 固定 IDRiD 官方 testing 的 103 張有效影像，與 APTOS 參考集無精確 RGB 像素重複。此檢查以 EXIF 方向校正後的 RGB 像素為準。
+- [x] **測試集五級覆蓋**　APTOS 保留測試與 IDRiD 官方測試兩組皆通過。
+
+| 階段 3 清單 | DR 0 | DR 1 | DR 2 | DR 3 | DR 4 | 合計 |
+|---|---:|---:|---:|---:|---:|---:|
+| APTOS 參考 | 1,437 | 270 | 738 | 142 | 217 | 2,804 |
+| APTOS 保留測試 | 359 | 68 | 184 | 35 | 54 | 700 |
+| IDRiD 官方測試 | 34 | 5 | 32 | 19 | 13 | 103 |
+- [x] 核對三份清單的 SHA-256、張數、各級分布與影像路徑。雜湊及 k=5、cosine、等權投票、平手規則與評分設定記錄於 `audit.json`。
+- [x] **使用者確認**　2026-11-19 已驗收階段 3，並授權進入階段 4。
 
 ## 階段 4　抽取官方權重的特徵
 
-- [ ] 登錄官方 checkpoint 的名稱、版本、來源、SHA-256、執行環境與前處理設定。
-- [ ] 用小批影像確認輸入為 RGB 且形狀為 `[N,3,392,392]`，輸出為 `[N,384]`、數值有限、各向量非零。記錄可重現的推論指令與小批輸出。
-- [ ] 對三份清單抽出特徵。核對檔案筆數、ID 集合、順序、形狀、有限性與非零向量，記錄特徵檔和清單的雜湊。
-- [ ] **使用者確認**　提交特徵查核結果與檔案位置，取得同意後進入階段 5。
+**目前進度（2026-11-19）**　已在 RTX 4070 使用官方 v0.1 權重，完成三份清單共 3,607 張影像的特徵抽取，使用者已驗收。
+
+官方權重位於工作目錄的 `models/retfoundgreen_statedict.pth`。重現步驟請看 [README](README.md)。
+
+```powershell
+$labPython = Join-Path (Resolve-Path '../../../../lab3/.venv').Path 'Scripts/python.exe'
+& $labPython -B -u scripts/extract_stage4.py
+```
+
+- [x] 登錄使用者下載的官方 v0.1 `retfoundgreen_statedict.pth`、本機 SHA-256、環境與 RGB 前處理設定。來源及完整設定見 [audit.json](artifacts/stage4/audit.json)。
+- [x] 6 張實際影像的小批驗證通過。RGB 輸入 `[6, 3, 392, 392]`，輸出 `[6, 384]`，數值全為有限值，各向量的 L2 範數均大於零。
+- [x] 抽取 APTOS 參考集 `[2804, 384]`、APTOS 保留測試集 `[700, 384]`、IDRiD 官方測試集 `[103, 384]`。重新讀取三份 `.npz`，確認影像 ID 與階段 3 的清單逐筆同序、無重複、特徵為有限的非零 float32 向量，並核對三份特徵檔與清單的 SHA-256。
+- [x] **使用者確認**　2026-11-19 已驗收第四階段並授權進入第五階段。
 
 ## 階段 5　分類及評分
 
-- [ ] 固定同一份 APTOS 參考庫和預先確認的規則，對 APTOS 測試與 IDRiD 測試各跑一次 k-NN。
-- [ ] 逐張保存預測、五級票數、鄰居 ID、參考等級與相似度。核對每筆五票、鄰居皆來自參考集、平手規則一致以及預測 ID 與測試清單一一對應。
-- [ ] 依測試 ID 加入真值，分別重算 Macro-F1、Accuracy、各級 Recall、support 和混淆矩陣。核對各資料集的評分筆數、矩陣總數及五級真值張數均大於 0。
-- [ ] 提交兩份預測、指標表和摘要。標示使用的 checkpoint、切分、主要錯誤和資料重疊查核範圍。
-- [ ] **使用者確認**　記錄結案驗收。
+- [x] 使用 [evaluate_stage5.py](scripts/evaluate_stage5.py)，兩組共用 2,804 張 APTOS 參考影像。固定 cosine、k=5 和等權投票。
+- [x] 兩份逐張預測 CSV 共 803 筆，已獨立重算五個鄰居、相似度、五級票數與預測等級，並確認影像 ID 與測試清單逐筆一致。
+- [x] 依影像 ID 加入真值，用 scikit-learn 重算 Accuracy、Macro-F1、各級 Recall 和混淆矩陣。矩陣與樣本數吻合，兩組五級真值皆有樣本。
+- [x] 已提交 [結果摘要](artifacts/stage5/summary.md)、兩份逐張預測及 [指標與雜湊](artifacts/stage5/metrics.json)。APTOS Macro-F1 為 55.50%，IDRiD 為 27.36%，相差 28.14 個百分點。
+- [x] 依使用者要求另跑 APTOS 70/30 補充實驗。參考集 2,453 張，測試集 1,051 張，包含原 700 張測試影像。IDRiD 沿用官方 103 張。詳見 [70/30 結果](artifacts/stage5_aptos_70_30/summary.md)。
+- [x] **使用者確認**　已確認簡版報告並要求整理專案與撰寫重現說明。
 
 ## 交接紀錄
 
@@ -56,3 +73,7 @@ python scripts/prepare_stage3.py --aptos-labels artifacts/aptos/train.csv --apto
 | 2026-11-19 | 階段 1 驗收，階段 2 完成原始權重介面查核 | 詳見 `ce59849` |
 | 2026-11-19 | 使用者選擇 k-NN，兩份文件已修訂 | 新版計畫驗收與階段 3 啟動 |
 | 2026-11-19 | 階段 3 已啟動，資料查核與切分程式通過合成測試 | 等待正式 APTOS 與 IDRiD 檔案 |
+| 2026-11-19 | 階段 3 正式資料與清單查核完成，兩測試集五級覆蓋通過 | 等待階段 3 驗收 |
+| 2026-11-19 | 使用者驗收階段 3 並核准開始階段 4，抽取流程通過隨機權重測試 | 等待官方 v0.1 checkpoint |
+| 2026-11-19 | 階段 4 官方權重載入與 3,607 張特徵抽取完成 | 等待階段 4 驗收 |
+| 2026-11-19 | 階段 4 已驗收，階段 5 分類與獨立評分查核完成 | 已確認簡版報告 |
