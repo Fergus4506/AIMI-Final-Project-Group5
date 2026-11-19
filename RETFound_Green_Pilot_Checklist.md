@@ -7,9 +7,23 @@
 - [x] 在空目錄初始化 Git（`8fef696`），先建立 pilot 分支與 worktree，再放入文件。階段 1 已經使用者驗收。
 - [x] 查核官方 v0.1 原始權重的 `num_classes=0` 設定與特徵輸出。直接分級的逐張分數、Accuracy 與 Macro-F1 在兩個資料集均為 N/A。查核紀錄見 `ce59849`，此階段採文件查核。
 - [x] 使用者於 2026-11-19 選擇第二項，即固定 APTOS 參考集的 k-NN。已更新計畫與 checklist。
-- [ ] **使用者確認**　呈交新版文件，記錄確認後才啟動階段 3。
+- [x] **使用者確認**　2026-11-19 已授權開始階段 3（含兩個測試集的五級覆蓋限制）。
 
 ## 階段 3　資料與評估規則
+
+**目前進度（2026-11-19）**　資料查核與切分程式已實作，等待正式資料。以合成影像驗證約 80/20 切分、五級覆蓋、重跑雜湊一致，以及排除跨資料集重複後缺級仍會中止。實際張數、雜湊與缺件待正式資料查核。
+
+- [x] 建立 [階段 3 查核程式](scripts/prepare_stage3.py)。輸出三份正式清單、audit.json 與 exclusions.csv。任一必要清單缺級時，輸出稽核與排除紀錄供查明原因。
+- [x] 確認發布來源。[APTOS 2019 Kaggle](https://www.kaggle.com/competitions/aptos2019-blindness-detection/data) 的有標註 train.csv 與 train_images。[IDRiD 官方頁面](https://idrid.grand-challenge.org/Home/) 指向 IEEE DataPort，需 Disease Grading 的官方 Testing Images 與 Testing Labels。另有 [Zenodo 的 Disease Grading 封存](https://zenodo.org/records/17219542)。
+- [ ] 取得實際檔案。本機已查的目錄未找到這兩份資料。執行環境解析 Kaggle 和 Zenodo 主機名稱失敗。
+
+執行指令由 pilot worktree 啟動。以下路徑為範例，填入實際解壓位置。需要 Python 3.9 與 Pillow。清單的影像路徑以 pilot worktree 為基準。
+
+```powershell
+python scripts/prepare_stage3.py --aptos-labels artifacts/aptos/train.csv --aptos-images artifacts/aptos/train_images --idrid-testing-labels "artifacts/idrid/Testing Labels.csv" --idrid-testing-images "artifacts/idrid/Testing Set" --output artifacts/stage3
+```
+
+
 
 - [ ] 登錄 APTOS、IDRiD 來源、版本、官方 split、影像與標註位置。
 - [ ] 逐筆對帳影像與 DR 標註，每份資料抽查至少三筆 ID、相對路徑與等級。列缺件、標註衝突、解碼失敗與重複影像的處置。
@@ -40,3 +54,4 @@
 |---|---|---|
 | 2026-11-19 | 階段 1 驗收，階段 2 完成原始權重介面查核 | 詳見 `ce59849` |
 | 2026-11-19 | 使用者選擇 k-NN，兩份文件已修訂 | 新版計畫驗收與階段 3 啟動 |
+| 2026-11-19 | 階段 3 已啟動，資料查核與切分程式通過合成測試 | 等待正式 APTOS 與 IDRiD 檔案 |
