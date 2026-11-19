@@ -15,7 +15,8 @@
 
 - [x] 建立 [階段 3 查核程式](scripts/prepare_stage3.py)。輸出三份正式清單、audit.json 與 exclusions.csv。任一必要清單缺級時，輸出稽核與排除紀錄供查明原因。
 - [x] 確認發布來源。[APTOS 2019 Kaggle](https://www.kaggle.com/competitions/aptos2019-blindness-detection/data) 的有標註 train.csv 與 train_images。[IDRiD 官方頁面](https://idrid.grand-challenge.org/Home/) 指向 IEEE DataPort，需 Disease Grading 的官方 Testing Images 與 Testing Labels。另有 [Zenodo 的 Disease Grading 封存](https://zenodo.org/records/17219542)。
-- [ ] 取得實際檔案。本機已查的目錄未找到這兩份資料。執行環境解析 Kaggle 和 Zenodo 主機名稱失敗。
+- [x] 在 pilot worktree 建立 .venv。已驗證 Python 3.9、Pillow 11.3.0、PNG 解碼及查核程式入口。套件站無法連線時，將本機既有的 Pillow 複製至虛擬環境。
+- [ ] 取得實際檔案。APTOS 官方 Kaggle 頁要求同意競賽規則。IDRiD 的 Zenodo ZIP 下載遭瀏覽器封鎖，IEEE DataPort 官方入口要求登入。下載完成後再查核三份清單。
 
 執行指令由 pilot worktree 啟動。以下路徑為範例，填入實際解壓位置。需要 Python 3.9 與 Pillow。清單的影像路徑以 pilot worktree 為基準。
 
